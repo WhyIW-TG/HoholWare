@@ -1,0 +1,136 @@
+local CORRECT_KEY = "Empaxis-Free-550891"
+local SCRIPT_RAW_URL = "https://raw.githubusercontent.com/WhyIW-TG/HoholWare/refs/heads/main/violete.lua"
+
+if game.CoreGui:FindFirstChild("HvH_Key_System") then
+    game.CoreGui["HvH_Key_System"]:Destroy()
+end
+
+local KeyGui = Instance.new("ScreenGui")
+KeyGui.Name = "HvH_Key_System"
+KeyGui.Parent = game.CoreGui
+KeyGui.ResetOnSpawn = false
+
+local KeyFrame = Instance.new("Frame")
+KeyFrame.Name = "KeyFrame"
+KeyFrame.Parent = KeyGui
+KeyFrame.BackgroundColor3 = Color3.fromRGB(20, 20, 20)
+KeyFrame.Size = UDim2.new(0, 360, 0, 220)
+KeyFrame.Position = UDim2.new(0.5, -180, 0.5, -110)
+KeyFrame.Active = true
+KeyFrame.Draggable = true
+Instance.new("UICorner", KeyFrame).CornerRadius = UDim.new(0, 8)
+
+local FrameStroke = Instance.new("UIStroke", KeyFrame)
+FrameStroke.Color = Color3.fromRGB(165, 30, 255)
+FrameStroke.Thickness = 2
+
+local Title = Instance.new("TextLabel")
+Title.Parent = KeyFrame
+Title.Size = UDim2.new(1, 0, 0, 45)
+Title.BackgroundTransparency = 1
+Title.Text = "Empaxis Beta | Key System"
+Title.TextColor3 = Color3.fromRGB(165, 30, 255)
+Title.Font = Enum.Font.GothamBold
+Title.TextSize = 18
+
+local KeyInput = Instance.new("TextBox")
+KeyInput.Parent = KeyFrame
+KeyInput.Position = UDim2.new(0, 25, 0, 65)
+KeyInput.Size = UDim2.new(1, -50, 0, 35)
+KeyInput.BackgroundColor3 = Color3.fromRGB(14, 14, 16)
+KeyInput.Text = ""
+KeyInput.PlaceholderText = "Введите лицензионный ключ..."
+KeyInput.TextColor3 = Color3.fromRGB(255, 255, 255)
+KeyInput.PlaceholderColor3 = Color3.fromRGB(100, 100, 100)
+KeyInput.Font = Enum.Font.Gotham
+KeyInput.TextSize = 14
+Instance.new("UICorner", KeyInput).CornerRadius = UDim.new(0, 5)
+local InputStroke = Instance.new("UIStroke", KeyInput)
+InputStroke.Color = Color3.fromRGB(40, 40, 45)
+
+local CheckButton = Instance.new("TextButton")
+CheckButton.Parent = KeyFrame
+CheckButton.Position = UDim2.new(0, 25, 0, 115)
+CheckButton.Size = UDim2.new(1, -50, 0, 35)
+CheckButton.BackgroundColor3 = Color3.fromRGB(165, 30, 255)
+CheckButton.Text = "Проверить ключ"
+CheckButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+CheckButton.Font = Enum.Font.GothamMedium
+CheckButton.TextSize = 14
+Instance.new("UICorner", CheckButton).CornerRadius = UDim.new(0, 5)
+
+local GetKeyButton = Instance.new("TextButton")
+GetKeyButton.Parent = KeyFrame
+GetKeyButton.Position = UDim2.new(0, 25, 0, 165)
+GetKeyButton.Size = UDim2.new(1, -50, 0, 35)
+GetKeyButton.BackgroundColor3 = Color3.fromRGB(30, 30, 35)
+GetKeyButton.Text = "Получить ключ (TG)"
+GetKeyButton.TextColor3 = Color3.fromRGB(200, 200, 200)
+GetKeyButton.Font = Enum.Font.GothamMedium
+GetKeyButton.TextSize = 13
+Instance.new("UICorner", GetKeyButton).CornerRadius = UDim.new(0, 5)
+
+local LinkStroke = Instance.new("UIStroke", GetKeyButton)
+LinkStroke.Color = Color3.fromRGB(165, 30, 255)
+LinkStroke.Thickness = 1
+LinkStroke.Transparency = 0.3
+
+local function LoadMainScript()
+    CheckButton.Text = "Загрузка скрипта..."
+    CheckButton.BackgroundColor3 = Color3.fromRGB(100, 30, 200)
+    
+    local success, scriptContent = pcall(function()
+        return game:HttpGet(SCRIPT_RAW_URL)
+    end)
+    
+    if success and scriptContent then
+        local TweenService = game:GetService("TweenService")
+        local fadeInfo = TweenInfo.new(0.4, Enum.EasingStyle.Quad, Enum.EasingDirection.Out)
+        TweenService:Create(KeyFrame, fadeInfo, {Size = UDim2.new(0, 360, 0, 0), Position = UDim2.new(0.5, -180, 0.5, 0)}):Play()
+        task.wait(0.4)
+        KeyGui:Destroy()
+        
+        local runScript, err = loadstring(scriptContent)
+        if runScript then
+            runScript()
+        else
+            warn("Ошибка компиляции скрипта: ", err)
+        end
+    else
+        CheckButton.BackgroundColor3 = Color3.fromRGB(200, 30, 30)
+        CheckButton.Text = "Ошибка подключения к GitHub!"
+        task.wait(2)
+        CheckButton.BackgroundColor3 = Color3.fromRGB(165, 30, 255)
+        CheckButton.Text = "Проверить ключ"
+    end
+end
+
+CheckButton.MouseButton1Click:Connect(function()
+    if KeyInput.Text == CORRECT_KEY then
+        CheckButton.BackgroundColor3 = Color3.fromRGB(30, 200, 30)
+        CheckButton.Text = "Доступ разрешен!"
+        task.wait(0.8)
+        LoadMainScript()
+    else
+        CheckButton.BackgroundColor3 = Color3.fromRGB(200, 30, 30)
+        CheckButton.Text = "Неверный ключ!"
+        task.wait(1.5)
+        CheckButton.BackgroundColor3 = Color3.fromRGB(165, 30, 255)
+        CheckButton.Text = "ну че пробуй дура"
+    end
+end)
+
+GetKeyButton.MouseButton1Click:Connect(function()
+    local url = "https://t.me/whyiw"
+    if setclipboard then
+        setclipboard(url)
+    end
+    if request then
+        request({Url = url, Method = "GET"})
+    elseif syn and syn.request then
+        syn.request({Url = url, Method = "GET"})
+    end
+    GetKeyButton.Text = "Ссылка скопирована!"
+    task.wait(1.5)
+    GetKeyButton.Text = "Получить ключ (TG)"
+end)
