@@ -19,7 +19,7 @@ jobs:
           
           echo "CURRENT_KEY=$NEW_KEY" >> $GITHUB_ENV
           
-          FILE_PATH="violete.lua" 
+          FILE_PATH="HoholWare-Main" 
           sed -i "s/local CORRECT_KEY = \".*\"/local CORRECT_KEY = \"$NEW_KEY\"/" $FILE_PATH
           
           echo "Новый сгенерированный ключ: $NEW_KEY"
