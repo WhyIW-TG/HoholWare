@@ -36,8 +36,11 @@ jobs:
             git push
           fi
 
-      - name: Send New Key to Telegram
+            - name: Send New Key to Telegram
         run: |
+          echo "Ожидаем 5 минут (300 секунд), чтобы обновился кэш GitHub RAW..."
+          sleep 300
+          
           CHAT_ID="@Empaxis_key"
           MESSAGE="🔑 *Обновлен ключ для Empaxis Beta\!*%0A%0AНовый ключ: \`${{ env.CURRENT_KEY }}\`%0A%0A_Ключ обновляется автоматически каждые 12 часов\._"
           
@@ -45,4 +48,4 @@ jobs:
             -d "chat_id=$CHAT_ID" \
             -d "text=$MESSAGE" \
             -d "parse_mode=MarkdownV2"
-            
+
