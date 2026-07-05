@@ -1,4 +1,4 @@
-local CORRECT_KEY = "EMPAXIS-BETA-2026"
+local CORRECT_KEY = "Empaxis-Free-550891"
 local SCRIPT_RAW_URL = "https://raw.githubusercontent.com/WhyIW-TG/HoholWare/refs/heads/main/violete.lua"
 
 if game.CoreGui:FindFirstChild("HvH_Key_System") then
