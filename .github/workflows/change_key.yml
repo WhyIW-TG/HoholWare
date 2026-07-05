@@ -1,1 +1,44 @@
 
+name: Rotate Script Key
+
+on:
+  schedule:
+    # Запуск каждые 12 часов (в 00:00 и 12:00 по UTC)
+    - cron: '0 */12 * * *'
+  workflow_dispatch: # Позволяет запускать генерацию вручную кнопкой на GitHub
+
+jobs:
+  update-key:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Generate new key and update file
+        run: |
+          # 1. Генерируем 6 случайных символов (цифры и буквы)
+          RANDOM_PART=$(head /dev/urandom | tr -dc 'A-Za-z0-9' | head -c 6)
+          NEW_KEY="Empaxis-Free-$RANDOM_PART"
+          
+          # Укажите здесь ПРАВИЛЬНОЕ имя вашего Lua-файла вместо script.lua
+          FILE_PATH="HoholWare-Main" 
+          
+          # 2. Заменяем строку с ключом в файле с помощью sed
+          sed -i "s/local CORRECT_KEY = \".*\"/local CORRECT_KEY = \"$NEW_KEY\"/" $FILE_PATH
+          
+          echo "Новый сгенерированный ключ: $NEW_KEY"
+
+      - name: Commit and Push changes
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          git add .
+          
+          # Проверяем, изменилось ли что-то, чтобы не делать пустые коммиты
+          if git diff-index --quiet HEAD --; then
+            echo "Изменений нет."
+          else
+            git commit -m "Автоматическое обновление ключа лицензии [skip ci]"
+            git push
+          fi
+          
