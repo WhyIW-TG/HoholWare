@@ -121,7 +121,7 @@ CheckButton.MouseButton1Click:Connect(function()
 end)
 
 GetKeyButton.MouseButton1Click:Connect(function()
-    local url = "https://t.me/whyiw"
+    local url = "https://t.me/Empaxis_key"
     if setclipboard then
         setclipboard(url)
     end
