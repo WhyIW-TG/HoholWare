@@ -3,9 +3,8 @@ name: Rotate Script Key
 
 on:
   schedule:
-    # Запуск каждые 12 часов (в 00:00 и 12:00 по UTC)
     - cron: '0 */12 * * *'
-  workflow_dispatch: # Позволяет запускать генерацию вручную кнопкой на GitHub
+  workflow_dispatch:
 
 jobs:
   update-key:
@@ -16,14 +15,13 @@ jobs:
 
       - name: Generate new key and update file
         run: |
-          # 1. Генерируем 6 случайных символов (цифры и буквы)
           RANDOM_PART=$(head /dev/urandom | tr -dc 'A-Za-z0-9' | head -c 6)
           NEW_KEY="Empaxis-Free-$RANDOM_PART"
           
-          # Укажите здесь ПРАВИЛЬНОЕ имя вашего Lua-файла вместо script.lua
-          FILE_PATH="HoholWare-Main" 
+          # Сохраняем ключ для следующего шага с Telegram
+          echo "CURRENT_KEY=$NEW_KEY" >> $GITHUB_ENV
           
-          # 2. Заменяем строку с ключом в файле с помощью sed
+          FILE_PATH="violete.lua" 
           sed -i "s/local CORRECT_KEY = \".*\"/local CORRECT_KEY = \"$NEW_KEY\"/" $FILE_PATH
           
           echo "Новый сгенерированный ключ: $NEW_KEY"
@@ -33,12 +31,23 @@ jobs:
           git config --global user.name "github-actions[bot]"
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
           git add .
-          
-          # Проверяем, изменилось ли что-то, чтобы не делать пустые коммиты
           if git diff-index --quiet HEAD --; then
             echo "Изменений нет."
           else
             git commit -m "Автоматическое обновление ключа лицензии [skip ci]"
             git push
           fi
+
+      - name: Send New Key to Telegram
+        run: |
+          # ЗАМЕНИТЕ ЭТИ ДАННЫЕ НА СВОИ:
+          TELEGRAM_TOKEN="8959353534:AAG0-ni8bCeSndUbISNW8Xoj4EoDXNVeWt8"
+          CHAT_ID="@Empaxis_key"
           
+          MESSAGE="🔑 *Обновлен ключ для Empaxis Beta\!*%0A%0AНовый ключ: \`${{ env.CURRENT_KEY }}\`%0A%0A_Ключ обновляется автоматически каждые 12 часов\._"
+          
+          # Отправка сообщения через Telegram API без сторонних библиотек
+          curl -s -X POST "https://api.telegram.org/bot$TELEGRAM_TOKEN/sendMessage" \
+            -d "chat_id=$CHAT_ID" \
+            -d "text=$MESSAGE" \
+            -d "parse_mode=MarkdownV2"
